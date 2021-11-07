@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: job # REPLACE #
+  namespace: NAMESPACE # REPLACE #
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 100
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            fsGroup: 20000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+          - name: container-name
+            image: IMAGE_NAME
+            imagePullPolicy: Always
+            command:
+              # REPLACE #
+            resources:
+              requests:
+                memory: "100Mi"
+                cpu: "0.2m"
+              limits:
+                memory: "500Mi"
+                cpu: "2"
+            securityContext:
+              readOnlyRootFilesystem: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL

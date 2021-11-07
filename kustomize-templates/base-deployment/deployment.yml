@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment # REPLACE #
+  namespace: NAMESPACE # REPLACE #
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      # REPLACE #
+  template:
+    metadata:
+      labels:
+        # REPLACE #
+    spec:
+      affinity:        
+        podAntiAffinity:     
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector: 
+                matchExpressions:
+                # REPLACE #
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                    - REPLACE
+              topologyKey: kubernetes.io/hostname
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 20000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: container-name
+        image: IMAGE_NAME
+        imagePullPolicy: Always
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          failureThreshold: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 1
+          periodSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 3
+          failureThreshold: 1
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "0.2m"
+          limits:
+            memory: "500Mi"
+            cpu: "2"
+        ports:
+        - containerPort: 80
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
