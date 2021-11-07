@@ -1,0 +1,45 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../base-deployment/
+  - ingress.yml  
+
+patches:
+  - path: pod-anti-affinity.patch.yml
+    target:
+      kind: Deployment
+  - path: limits.patch.yml
+    target:
+      kind: Deployment
+  - path: pod-disruption-budget.patch.yml
+    target:
+      kind: PodDisruptionBudget
+
+namePrefix: best-practice-
+namespace: development
+
+images:
+  - name: IMAGE_NAME
+    newName: nginx
+    newTag: stable
+
+replicas:
+  - name: deployment
+    count: 8
+
+commonLabels:
+  app.kubernetes.io/name: BestPracticeDeployment
+  app.kubernetes.io/version: "0.0.1"
+  app.kubernetes.io/component: Web
+  app.kubernetes.io/part-of: BestPractice
+  app.kubernetes.io/managed-by: Pipeline
+
+# Disabled secret generation as this should be kept secret and should ideally be injected into a cluster in a secure way
+# Below is a example of how you can include a TLS certificate if required
+# secretGenerator:
+# - name: domain-tls-secret
+#   files:
+#   - tls.crt=tls.cert
+#   - tls.key=tls.key
+#   type: "kubernetes.io/tls"

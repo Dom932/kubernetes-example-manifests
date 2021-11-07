@@ -1,0 +1,46 @@
+---
+name: Update Manifests Files - CI
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "kustomize-templates/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Generate Manifests
+        id: kustomize
+        run: |
+          kustomize build --load-restrictor LoadRestrictionsNone ./kustomize-templates/best-practice-deployment/ > ./example-manifests/best-practice-deployment.yml
+          kustomize build --load-restrictor LoadRestrictionsNone ./kustomize-templates/best-practice-cron-job/ > ./example-manifests/best-practice-cron-job.yml
+
+      - name: kube-lint Scan
+        uses: stackrox/kube-linter-action@v1.0.4
+        with:
+          directory: example-manifests
+
+      - name: Checkov Scan
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ./manifests/
+          # CKV_K8S_43 - Image should use digest
+          skip_check: CKV_K8S_43
+          quiet: true
+          framework: kubernetes
+
+      - name: Commit Generated manifests
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add example-manifests/\*.yml
+          git commit -a -m "Updated manifest files"
+          git push

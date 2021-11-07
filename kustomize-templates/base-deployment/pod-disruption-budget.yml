@@ -1,0 +1,12 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb # REPLACE #
+  namespace: NAMESPACE # REPLACE #
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      # REPLACE #
+      app.kubernetes.io/name: REPLACE
+      

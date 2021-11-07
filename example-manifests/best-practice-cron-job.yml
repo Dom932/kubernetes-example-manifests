@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels:
+    app.kubernetes.io/component: Web
+    app.kubernetes.io/managed-by: Pipeline
+    app.kubernetes.io/name: BestPracticeDeployment
+    app.kubernetes.io/part-of: BestPractice
+    app.kubernetes.io/version: 0.0.1
+  name: best-practice-job
+  namespace: development
+spec:
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/component: Web
+        app.kubernetes.io/managed-by: Pipeline
+        app.kubernetes.io/name: BestPracticeDeployment
+        app.kubernetes.io/part-of: BestPractice
+        app.kubernetes.io/version: 0.0.1
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/component: Web
+            app.kubernetes.io/managed-by: Pipeline
+            app.kubernetes.io/name: BestPracticeDeployment
+            app.kubernetes.io/part-of: BestPractice
+            app.kubernetes.io/version: 0.0.1
+        spec:
+          automountServiceAccountToken: false
+          containers:
+          - command:
+            - sleep 300
+            image: busybox:stable
+            imagePullPolicy: Always
+            name: container-name
+            resources:
+              limits:
+                cpu: "3"
+                memory: 700Mi
+              requests:
+                cpu: 0.5m
+                memory: 200Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              readOnlyRootFilesystem: true
+          restartPolicy: Never
+          securityContext:
+            fsGroup: 20000
+            runAsGroup: 10001
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+  schedule: '*/1 * * * *'
+  startingDeadlineSeconds: 100

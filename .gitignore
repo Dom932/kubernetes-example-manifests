@@ -1,0 +1,4 @@
+# Ignore files created by kube-linter action
+kube-linter
+kube-linter-*
+kubelinter.log

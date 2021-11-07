@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../base-cron-job/
+
+patches:
+  - path: limits.patch.yml
+    target:
+      kind: CronJob
+  - path: command.patch.yml
+    target:
+      kind: CronJob
+
+namePrefix: best-practice-
+namespace: development
+
+images:
+  - name: IMAGE_NAME
+    newName: busybox
+    newTag: stable
+
+commonLabels:
+  app.kubernetes.io/name: BestPracticeDeployment
+  app.kubernetes.io/version: "0.0.1"
+  app.kubernetes.io/component: Web
+  app.kubernetes.io/part-of: BestPractice
+  app.kubernetes.io/managed-by: Pipeline

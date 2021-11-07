@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress # REPLACE
+  namespace: NAMESPACE # REPLACE
+spec:
+  tls:
+  - hosts:
+      - example.domain.com
+    secretName: domain-tls-secret
+  rules:
+  - host: example.domain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: best-practice-service
+            port:
+              number: 80

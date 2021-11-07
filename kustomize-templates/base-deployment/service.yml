@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service # REPLACE #
+  namespace: NAMESPACE # REPLACE #
+spec:
+  type: ClusterIP
+  selector:
+    # REPLACE #
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
