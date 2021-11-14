@@ -3,26 +3,14 @@ kind: Kustomization
 
 resources:
   - ../base-deployment/
-  - ingress.yml  
-
-patches:
-  - path: pod-anti-affinity.patch.yml
-    target:
-      kind: Deployment
-  - path: limits.patch.yml
-    target:
-      kind: Deployment
-  - path: pod-disruption-budget.patch.yml
-    target:
-      kind: PodDisruptionBudget
 
 namePrefix: best-practice-
 namespace: development
 
 images:
   - name: IMAGE_NAME
-    newName: nginx
-    newTag: stable
+    newName: ubuntu
+    newTag: "20.04"
 
 replicas:
   - name: deployment
@@ -34,6 +22,49 @@ commonLabels:
   app.kubernetes.io/component: Web
   app.kubernetes.io/part-of: BestPractice
   app.kubernetes.io/managed-by: Pipeline
+
+patches:
+  - target:
+      kind: Deployment
+    path: pod-anti-affinity.patch.yml
+  - target:
+      kind: Ingress
+      name: ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: custom.domain.local
+      - op: replace
+        path: /spec/tls/0/hosts
+        value: 
+          - custom.domain.local
+      - op: replace
+        path: /spec/rules/0/http/paths/0/path
+        value: /subpath
+      - op: replace
+        path: /spec/tls/0/secretName
+        value: tls-secret
+  - target:
+      kind: PodDisruptionBudget
+      name: pdb
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 5
+  - target:
+      kind: Deployment
+      name: deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: '120m'
+          memory: '150Mi'
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: '300m'
+          memory: '300Mi'
 
 # Disabled secret generation as this should be kept secret and should ideally be injected into a cluster in a secure way
 # Below is a example of how you can include a TLS certificate if required

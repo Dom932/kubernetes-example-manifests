@@ -63,7 +63,7 @@ spec:
             topologyKey: kubernetes.io/hostname
       automountServiceAccountToken: false
       containers:
-      - image: nginx:stable
+      - image: ubuntu:20.04
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 1
@@ -75,19 +75,20 @@ spec:
         name: container-name
         ports:
         - containerPort: 80
+          name: http
         readinessProbe:
           httpGet:
             path: /ready
             port: 80
-          initialDelaySeconds: 1
+          initialDelaySeconds: 5
           periodSeconds: 3
         resources:
           limits:
-            cpu: "3"
-            memory: 700Mi
+            cpu: 300m
+            memory: 300Mi
           requests:
-            cpu: 0.5m
-            memory: 200Mi
+            cpu: 120m
+            memory: 150Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -102,6 +103,7 @@ spec:
           periodSeconds: 10
       securityContext:
         fsGroup: 20000
+        fsGroupChangePolicy: OnRootMismatch
         runAsGroup: 10001
         runAsNonRoot: true
         runAsUser: 10001
@@ -120,7 +122,7 @@ metadata:
   name: best-practice-pdb
   namespace: development
 spec:
-  minAvailable: 4
+  minAvailable: 5
   selector:
     matchLabels:
       app.kubernetes.io/component: Web
@@ -142,7 +144,7 @@ metadata:
   namespace: development
 spec:
   rules:
-  - host: example.domain.com
+  - host: custom.domain.local
     http:
       paths:
       - backend:
@@ -150,9 +152,9 @@ spec:
             name: best-practice-service
             port:
               number: 80
-        path: /
+        path: /subpath
         pathType: Prefix
   tls:
   - hosts:
-    - example.domain.com
-    secretName: domain-tls-secret
+    - custom.domain.local
+    secretName: tls-secret

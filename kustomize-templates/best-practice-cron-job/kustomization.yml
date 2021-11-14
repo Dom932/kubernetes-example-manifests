@@ -4,21 +4,13 @@ kind: Kustomization
 resources:
   - ../base-cron-job/
 
-patches:
-  - path: limits.patch.yml
-    target:
-      kind: CronJob
-  - path: command.patch.yml
-    target:
-      kind: CronJob
-
 namePrefix: best-practice-
 namespace: development
 
 images:
   - name: IMAGE_NAME
-    newName: busybox
-    newTag: stable
+    newName: ubuntu
+    newTag: "20.04"
 
 commonLabels:
   app.kubernetes.io/name: BestPracticeDeployment
@@ -26,3 +18,27 @@ commonLabels:
   app.kubernetes.io/component: Web
   app.kubernetes.io/part-of: BestPractice
   app.kubernetes.io/managed-by: Pipeline
+
+patches:
+  - target:
+      kind: CronJob
+      name: job
+    patch: |-
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: '120m'
+          memory: '150Mi'
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: '300m'
+          memory: '300Mi'
+  - target:
+      kind: CronJob
+      name: job
+    patch: |-
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/command
+        value:
+          - sleep 300

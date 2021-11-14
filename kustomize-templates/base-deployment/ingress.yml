@@ -16,6 +16,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: best-practice-service
+            name: service
             port:
               number: 80
