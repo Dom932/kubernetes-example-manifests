@@ -33,16 +33,16 @@ spec:
           containers:
           - command:
             - sleep 300
-            image: busybox:stable
+            image: ubuntu:20.04
             imagePullPolicy: Always
             name: container-name
             resources:
               limits:
-                cpu: "3"
-                memory: 700Mi
+                cpu: 300m
+                memory: 300Mi
               requests:
-                cpu: 0.5m
-                memory: 200Mi
+                cpu: 120m
+                memory: 150Mi
             securityContext:
               allowPrivilegeEscalation: false
               capabilities:
@@ -52,6 +52,7 @@ spec:
           restartPolicy: Never
           securityContext:
             fsGroup: 20000
+            fsGroupChangePolicy: OnRootMismatch
             runAsGroup: 10001
             runAsNonRoot: true
             runAsUser: 10001
