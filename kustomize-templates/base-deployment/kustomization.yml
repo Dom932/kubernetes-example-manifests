@@ -5,3 +5,4 @@ resources:
 - deployment.yml
 - service.yml
 - pod-disruption-budget.yml
+- ingress.yml

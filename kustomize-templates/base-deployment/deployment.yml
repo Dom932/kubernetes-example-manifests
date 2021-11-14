@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deployment # REPLACE #
-  namespace: NAMESPACE # REPLACE #
+  namespace: NAMESPACE # REPLACE #     
 spec:
   replicas: 3
   selector:
@@ -30,6 +30,7 @@ spec:
         runAsUser: 10001
         runAsGroup: 10001
         fsGroup: 20000
+        fsGroupChangePolicy: "OnRootMismatch"
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -46,7 +47,7 @@ spec:
           httpGet:
             path: /ready
             port: 80
-          initialDelaySeconds: 1
+          initialDelaySeconds: 5
           periodSeconds: 3
         livenessProbe:
           httpGet:
@@ -63,7 +64,8 @@ spec:
             memory: "500Mi"
             cpu: "2"
         ports:
-        - containerPort: 80
+        - name: http
+          containerPort: 80
         securityContext:
           readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
