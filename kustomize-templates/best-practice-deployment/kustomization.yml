@@ -10,7 +10,7 @@ namespace: development
 images:
   - name: IMAGE_NAME
     newName: ubuntu
-    newTag: 20.04
+    newTag: "20.04"
 
 replicas:
   - name: deployment

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deployment # REPLACE #
-  namespace: NAMESPACE # REPLACE #     
+  namespace: NAMESPACE # REPLACE #
 spec:
   replicas: 3
   selector:
